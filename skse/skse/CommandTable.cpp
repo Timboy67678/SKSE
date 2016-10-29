@@ -84,12 +84,12 @@ void CommandTable::Add(const CommandInfo * cmdSrc)
 
 void CommandTable::PatchEXE(const PatchSet * patches)
 {
-	ApplyPatch(patches->start, (UInt32)&m_commands.front());
-	ApplyPatch(patches->end, (UInt32)&m_commands.back());
+	ApplyPatch(patches->start, (UIntPtr)&m_commands.front());
+	ApplyPatch(patches->end, (UIntPtr)&m_commands.back());
 	ApplyPatch(patches->maxIdx, m_commands.size() + m_baseID);
 }
 
-void CommandTable::ApplyPatch(const PatchLocation * patch, UInt32 newData)
+void CommandTable::ApplyPatch(const PatchLocation * patch, UIntPtr newData)
 {
 	for(; patch->ptr; ++patch)
 	{

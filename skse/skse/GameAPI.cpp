@@ -27,10 +27,10 @@ struct TLSData
 	UInt8	pad2F9[3];						// 2F9
 };
 
-static TLSData * GetTLSData()
+static TLSData* GetTLSData()
 {
 	UInt32 TlsIndex = *g_TlsIndexPtr;
-	TLSData * data = NULL;
+	TLSData* data = NULL;
 #ifdef _WIN64
 	data = *reinterpret_cast<TLSData**>( __readgsqword( 0x58 ) + sizeof( UIntPtr ) * TlsIndex );
 #else

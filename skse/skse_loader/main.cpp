@@ -408,23 +408,24 @@ static bool DoInjectDLLThread(PROCESS_INFORMATION * info, const char * dllPath, 
 		PROCESS_CREATE_THREAD | PROCESS_QUERY_INFORMATION | PROCESS_VM_OPERATION | PROCESS_VM_WRITE | PROCESS_VM_READ, FALSE, info->dwProcessId);
 	if(process)
 	{
-		UInt32	hookBase = (UInt32)VirtualAllocEx(process, NULL, 8192, MEM_COMMIT, PAGE_EXECUTE_READWRITE);
+		UIntPtr	hookBase = (UIntPtr)VirtualAllocEx(process, NULL, 8192, MEM_COMMIT, PAGE_EXECUTE_READWRITE);
 		if(hookBase)
 		{
 			// safe because kernel32 is loaded at the same address in all processes
 			// (can change across restarts)
-			UInt32	loadLibraryAAddr = (UInt32)GetProcAddress(GetModuleHandle("kernel32.dll"), "LoadLibraryA");
+			UIntPtr	loadLibraryAAddr = (UIntPtr)GetProcAddress(GetModuleHandle("kernel32.dll"), "LoadLibraryA");
 
 			_MESSAGE("hookBase = %08X", hookBase);
 			_MESSAGE("loadLibraryAAddr = %08X", loadLibraryAAddr);
 
-			UInt32	bytesWritten;
+			size_t	bytesWritten;
 			WriteProcessMemory(process, (LPVOID)(hookBase + 5), dllPath, strlen(dllPath) + 1, &bytesWritten);
 
 			UInt8	hookCode[5];
 
+			//TODO: x64
 			hookCode[0] = 0xE9;
-			*((UInt32 *)&hookCode[1]) = loadLibraryAAddr - (hookBase + 5);
+			*((UIntPtr *)&hookCode[1]) = loadLibraryAAddr - (hookBase + 5);
 
 			WriteProcessMemory(process, (LPVOID)(hookBase), hookCode, sizeof(hookCode), &bytesWritten);
 

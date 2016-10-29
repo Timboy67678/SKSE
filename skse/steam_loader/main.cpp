@@ -17,6 +17,8 @@
 
 #include <intrin.h>
 
+//TODO: x64 this shit
+
 IDebugLog	gLog;
 HANDLE		g_dllHandle;
 
@@ -104,7 +106,7 @@ void DumpThreads(void)
 			{
 				if(info.th32OwnerProcessID == GetCurrentProcessId())
 				{
-					UInt32	eip = 0xFFFFFFFF;
+					UInt32	xip = 0xFFFFFFFF;
 
 					HANDLE	thread = OpenThread(THREAD_GET_CONTEXT, FALSE, info.th32ThreadID);
 					if(thread)
@@ -114,16 +116,18 @@ void DumpThreads(void)
 						ctx.ContextFlags = CONTEXT_CONTROL;
 
 						GetThreadContext(thread, &ctx);
-
-						eip = ctx.Eip;
-
+#ifdef _WIN64
+						xip = ctx.Rip;
+#else
+						xip = ctx.Eip;
+#endif
 						CloseHandle(thread);
 					}
 
 					_MESSAGE("thread %d pri %d eip %08X%s",
 						info.th32ThreadID,
 						info.tpBasePri,
-						eip,
+						xip,
 						(info.th32ThreadID == GetCurrentThreadId()) ? " current thread" : "");
 				}
 

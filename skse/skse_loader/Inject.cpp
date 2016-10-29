@@ -13,11 +13,12 @@ struct HookLayout
 	struct DoLoadLibrary
 	{
 		UInt8	push;		// 68
-		UInt32	strAddr;	// address
+		UIntPtr	strAddr;	// address
 		UInt8	indCall1;	// FF
 		UInt8	indCall2;	// 15
-		UInt32	callAddr;	// address
-
+		UIntPtr	callAddr;	// address
+		
+		//TODO: x64
 		void	Clear(void)
 		{
 			// nops
@@ -28,7 +29,7 @@ struct HookLayout
 			callAddr = 0x90909090;
 		}
 
-		void	Setup(UInt32 _strAddr, UInt32 _callAddr)
+		void	Setup(UIntPtr _strAddr, UIntPtr _callAddr)
 		{
 			push = 0x68;
 			strAddr = _strAddr;
@@ -48,7 +49,7 @@ struct HookLayout
 
 	// data
 	char			libNames[kMaxLibNameLen * kNumLibs];
-	UInt32			mainAddr;
+	UIntPtr			mainAddr;
 
 	void	Init(ProcHookInfo * hookInfo)
 	{
@@ -80,8 +81,8 @@ struct HookSetup
 	HookLayout	m_data;
 
 	HANDLE	m_proc;
-	UInt32	m_base;
-	UInt32	m_loadLib;
+	UIntPtr	m_base;
+	UIntPtr	m_loadLib;
 
 	UInt32	m_libIdx;
 	UInt32	m_strOffset;
@@ -107,7 +108,7 @@ struct HookSetup
 		if(m_isInit) return true;
 
 		m_loadLib =				hookInfo->loadLibAddr;
-		UInt32 hookBaseAddr =	hookInfo->hookCallAddr;
+		UIntPtr hookBaseAddr =	hookInfo->hookCallAddr;
 
 		m_data.Init(hookInfo);
 
@@ -115,11 +116,11 @@ struct HookSetup
 			PROCESS_CREATE_THREAD | PROCESS_QUERY_INFORMATION | PROCESS_VM_OPERATION | PROCESS_VM_WRITE | PROCESS_VM_READ, FALSE, info->dwProcessId);
 		if(m_proc)
 		{
-			m_base = (UInt32)VirtualAllocEx(m_proc, NULL, sizeof(m_data), MEM_COMMIT, PAGE_EXECUTE_READWRITE);
+			m_base = (UIntPtr)VirtualAllocEx(m_proc, NULL, sizeof(m_data), MEM_COMMIT, PAGE_EXECUTE_READWRITE);
 			if(m_base)
 			{
-				UInt32	hookBaseCallAddr;
-				UInt32	bytesTransferred = 0;
+				UIntPtr	hookBaseCallAddr;
+				size_t	bytesTransferred = 0;
 
 				_MESSAGE("remote memory = %08X", m_base);
 
@@ -135,7 +136,7 @@ struct HookSetup
 					m_data.mainAddr =			hookBaseCallAddr;
 					m_data.callMainAddr =		GetRemoteOffset(&m_data.mainAddr);
 
-					UInt32	newHookDst = m_base - hookBaseAddr - 5;
+					UIntPtr	newHookDst = m_base - hookBaseAddr - 5;
 					if(	WriteProcessMemory(m_proc, (void *)(hookBaseAddr + 1), &newHookDst, sizeof(newHookDst), &bytesTransferred) &&
 						(bytesTransferred == sizeof(newHookDst)))
 					{
@@ -195,14 +196,14 @@ struct HookSetup
 		return result;
 	}
 
-	UInt32	GetRemoteOffset(void * data)
+	UIntPtr	GetRemoteOffset(void * data)
 	{
-		return m_base + ((UInt32)data) - ((UInt32)&m_data);
+		return m_base + ((UIntPtr)data) - ((UIntPtr)&m_data);
 	}
 
 	bool	UpdateRemoteProc(void)
 	{
-		UInt32	bytesTransferred;
+		size_t	bytesTransferred;
 		return	WriteProcessMemory(m_proc, (void *)m_base, &m_data, sizeof(m_data), &bytesTransferred) &&
 			(bytesTransferred == sizeof(m_data));
 	}

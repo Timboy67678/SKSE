@@ -109,7 +109,7 @@ public:
 
 	struct PatchLocation
 	{
-		UInt32	ptr;
+		UIntPtr	ptr;
 		UInt32	offset;
 		UInt32	type;
 	};
@@ -140,5 +140,5 @@ private:
 	UInt32	m_curID;
 	bool	m_patched;
 
-	void	ApplyPatch(const PatchLocation * patch, UInt32 newData);
+	void	ApplyPatch(const PatchLocation * patch, UIntPtr newData);
 };

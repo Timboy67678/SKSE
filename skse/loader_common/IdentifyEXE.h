@@ -14,8 +14,8 @@ struct ProcHookInfo
 {
 	UInt64	version;
 	UInt32	procType;
-	UInt32	hookCallAddr;
-	UInt32	loadLibAddr;
+	UIntPtr	hookCallAddr;
+	UIntPtr	loadLibAddr;
 	bool	noGore;
 	bool	russian;
 	bool	japanese;
