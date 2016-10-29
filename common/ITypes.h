@@ -16,6 +16,12 @@ typedef signed long long	SInt64;		//!< A signed 64-bit integer value
 typedef float				Float32;	//!< A 32-bit floating point value
 typedef double				Float64;	//!< A 64-bit floating point value
 
+#ifdef _WIN64
+typedef UInt64 UIntPtr;
+#else
+typedef UInt32 UIntPtr;
+#endif
+
 inline UInt32 Extend16(UInt32 in)
 {
 	return (in & 0x8000) ? (0xFFFF0000 | in) : in;

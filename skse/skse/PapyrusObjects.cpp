@@ -162,7 +162,7 @@ bool WriteSKSEObject(SKSESerializationInterface* intfc, ISKSEObject* obj)
 	intfc->OpenRecord('OBJE', version);
 
 	size_t rawLen = strlen(name);
-	UInt32 len    = (std::min)(rawLen, kMaxNameLen);
+	UInt32 len    = __min(rawLen, kMaxNameLen);
 
 	if (! WriteData(intfc, &len))
 		return false;

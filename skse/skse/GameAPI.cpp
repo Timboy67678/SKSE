@@ -31,13 +31,16 @@ static TLSData * GetTLSData()
 	UInt32 TlsIndex = *g_TlsIndexPtr;
 	TLSData * data = NULL;
 
+#ifdef _WIN64
+	
+#else
 	__asm {
 		mov		ecx,	[TlsIndex]
 		mov		edx,	fs:[2Ch]	// linear address of thread local storage array
 		mov		eax,	[edx+ecx*4]
 		mov		[data], eax
 	}
-
+#endif
 	return data;
 }
 
