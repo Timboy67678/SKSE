@@ -18,8 +18,10 @@ typedef double				Float64;	//!< A 64-bit floating point value
 
 #ifdef _WIN64
 typedef UInt64 UIntPtr;
+typedef SInt64 SIntPtr;
 #else
 typedef UInt32 UIntPtr;
+typedef SInt32 SIntPtr;
 #endif
 
 inline UInt32 Extend16(UInt32 in)

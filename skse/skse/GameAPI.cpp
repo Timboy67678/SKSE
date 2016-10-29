@@ -1,22 +1,23 @@
 #include "GameAPI.h"
 #include "Utilities.h"
 
-Heap * g_formHeap = (Heap *)0x01B418B0;
+Heap* g_formHeap = (Heap*)0x01B418B0; //SSE: load_addr + 0x25A2400
 
-void * FormHeap_Allocate(UInt32 size)
+void* FormHeap_Allocate(UInt32 size)
 {
 	return CALL_MEMBER_FN(g_formHeap, Allocate)(size, 0, false);
 }
 
-void FormHeap_Free(void * ptr)
+void FormHeap_Free(void* ptr)
 {
 	CALL_MEMBER_FN(g_formHeap, Free)(ptr, false);
 }
 
-PlayerCharacter	** g_thePlayer = (PlayerCharacter **)0x01B2E8E4;
-const UInt32 * g_TlsIndexPtr = (UInt32 *)0x01BBEB54;
-UInt32 * g_consoleHandle = (UInt32*)0x01B3E6EC;
+PlayerCharacter** g_thePlayer = (PlayerCharacter **)0x01B2E8E4; //SSE: load_adrr + 0x3954CB8
+const UIntPtr* g_TlsIndexPtr = (UIntPtr *)0x01BBEB54; //SSE: load_addr + 0x3954CB8
+UIntPtr* g_consoleHandle = (UIntPtr*)0x01B3E6EC; //SSE: load_addr + 0x39815FC
 
+//This is probably incorrect for x64, recheck!
 struct TLSData
 {
 	// thread local storage
@@ -30,9 +31,8 @@ static TLSData * GetTLSData()
 {
 	UInt32 TlsIndex = *g_TlsIndexPtr;
 	TLSData * data = NULL;
-
 #ifdef _WIN64
-	
+	data = *reinterpret_cast<TLSData**>( __readgsqword( 0x58 ) + sizeof( UIntPtr ) * TlsIndex );
 #else
 	__asm {
 		mov		ecx,	[TlsIndex]
@@ -46,7 +46,7 @@ static TLSData * GetTLSData()
 
 void Console_Print(const char * fmt, ...)
 {
-	ConsoleManager	* mgr = ConsoleManager::GetSingleton();
+	ConsoleManager* mgr = ConsoleManager::GetSingleton();
 	if(mgr)
 	{
 		va_list	args;

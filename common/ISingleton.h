@@ -20,8 +20,8 @@ class ISingleton
 		ISingleton()
 		{
 			ASSERT(!ms_Singleton);
-			int offset = (int)(T *)1 - (int)(ISingleton <T> *)(T *)1;
-			ms_Singleton = (T *)((int)this + offset);
+			SIntPtr offset = (SIntPtr)(T *)1 - (UIntPtr)(ISingleton <T> *)(T *)1;
+			ms_Singleton = (T *)((UIntPtr)this + offset);
 		}
 
 		virtual ~ISingleton()

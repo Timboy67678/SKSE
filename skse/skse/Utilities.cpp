@@ -87,13 +87,13 @@ bool GetConfigOption_UInt32(const char * section, const char * key, UInt32 * dat
 struct RTTIType
 {
 	void	* typeInfo;
-	UInt32	pad;
+	UIntPtr	pad;
 	char	name[0];
 };
 
 struct RTTILocator
 {
-	UInt32		sig, offset, cdOffset;
+	UIntPtr		sig, offset, cdOffset;
 	RTTIType	* type;
 };
 #pragma warning (pop)
@@ -135,16 +135,16 @@ const char * GetObjectClassName(void * objBase)
 
 void DumpClass(void * theClassPtr, UInt32 nIntsToDump)
 {
-	UInt32* basePtr = (UInt32*)theClassPtr;
+	UIntPtr* basePtr = (UIntPtr*)theClassPtr;
 	_MESSAGE("DumpClass: %X", basePtr);
 
 	gLog.Indent();
 
 	if (!theClassPtr) return;
 	for (UInt32 ix = 0; ix < nIntsToDump; ix++ ) {
-		UInt32* curPtr = basePtr+ix;
+		UIntPtr* curPtr = basePtr+ix;
 		const char* curPtrName = NULL;
-		UInt32 otherPtr = 0;
+		UIntPtr otherPtr = 0;
 		float otherFloat = 0.0;
 		const char* otherPtrName = NULL;
 		if (curPtr) {
@@ -252,8 +252,7 @@ void * GetIATAddr(UInt8 * base, const char * searchDllName, const char * searchI
 {
 	IMAGE_DOS_HEADER		* dosHeader = (IMAGE_DOS_HEADER *)base;
 	IMAGE_NT_HEADERS		* ntHeader = (IMAGE_NT_HEADERS *)(base + dosHeader->e_lfanew);
-	IMAGE_IMPORT_DESCRIPTOR	* importTable =
-		(IMAGE_IMPORT_DESCRIPTOR *)(base + ntHeader->OptionalHeader.DataDirectory[IMAGE_DIRECTORY_ENTRY_IMPORT].VirtualAddress);
+	IMAGE_IMPORT_DESCRIPTOR	* importTable = (IMAGE_IMPORT_DESCRIPTOR *)(base + ntHeader->OptionalHeader.DataDirectory[IMAGE_DIRECTORY_ENTRY_IMPORT].VirtualAddress);
 
 	for(; importTable->Characteristics; ++importTable)
 	{
@@ -264,7 +263,7 @@ void * GetIATAddr(UInt8 * base, const char * searchDllName, const char * searchI
 			// found the dll
 
 			IMAGE_THUNK_DATA	* thunkData = (IMAGE_THUNK_DATA *)(base + importTable->OriginalFirstThunk);
-			UInt32				* iat = (UInt32 *)(base + importTable->FirstThunk);
+			UIntPtr				* iat = (UIntPtr *)(base + importTable->FirstThunk);
 
 			for(; thunkData->u1.Ordinal; ++thunkData, ++iat)
 			{

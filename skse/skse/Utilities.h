@@ -18,7 +18,7 @@
 																					\
 	inline _##functionName##_type * _##functionName##_GetPtr(void)					\
 	{																				\
-		static const UInt32 _address = address;										\
+		static const UIntPtr _address = address;										\
 		return (_##functionName##_type *)&_address;									\
 	}
 
@@ -35,17 +35,17 @@ bool GetConfigOption_UInt32(const char * section, const char * key, UInt32 * dat
 
 // this is the solution to getting a pointer-to-member-function pointer
 template <typename T>
-UInt32 GetFnAddr(T src)
+UIntPtr GetFnAddr(T src)
 {
 	union
 	{
-		UInt32	u32;
+		UIntPtr	uptr;
 		T		t;
 	} data;
 
 	data.t = src;
 
-	return data.u32;
+	return data.uptr;
 }
 
 const char * GetObjectClassName(void * objBase);
