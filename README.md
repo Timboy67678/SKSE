@@ -1,3 +1,7 @@
+# Discontinued
+
+After careful consideration, i dont have the time to completely port this entire project to x64 by myself, i wont be working on this anymore, if someone wants to take over probably best to fork or something, AFAIK the original SKSE team is already working for a skyrim special edition version anyway. Best to probably wait for that
+
 # SKSE
 Adding support for SSE to base SKSE (hopefully, WIP)
 
